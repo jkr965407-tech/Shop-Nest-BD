@@ -357,11 +357,10 @@
             <label>Price (৳) *</label>
             <input type="number" id="newProdPrice" required placeholder="Price">
           </div>
-          <div class="form-group">
-            <label>Image URL *</label>
-            <input type="url" id="newProdImage" required placeholder="Image link">
-          </div>
-        </div>
+<div class="form-group">
+  <label>Image *</label>
+  <input type="file" id="newProdImage" accept="image/*" required>
+</div>        </div>
         <div class="form-group">
           <label>Description *</label>
           <textarea id="newProdDesc" rows="2" required placeholder="Details..."></textarea>
@@ -478,14 +477,33 @@
 
     function handleAddNewProduct(e) {
       e.preventDefault();
-      const newProduct = {
-        id: Date.now(),
-        name: document.getElementById('newProdName').value,
-        category: document.getElementById('newProdCategory').value,
-        price: parseFloat(document.getElementById('newProdPrice').value),
-        image: document.getElementById('newProdImage').value,
-        desc: document.getElementById('newProdDesc').value
-      };
+      const imageInput = document.getElementById('newProdImage');
+const imageFile = imageInput.files[0];
+
+if (imageFile) {
+  const reader = new FileReader();
+  
+  reader.onload = function (e) {
+    const newProduct = {
+      id: Date.now(),
+      name: document.getElementById('newProdName').value,
+      category: document.getElementById('newProdCategory').value,
+      price: parseFloat(document.getElementById('newProdPrice').value),
+      image: e.target.result, // সিলেক্ট করা ছবি সরাসরি Base64 ডাটা হিসেবে সেভ হবে
+      desc: document.getElementById('newProdDesc').value
+    };
+
+    productsDB.unshift(newProduct);
+    localStorage.setItem('shopnest_products', JSON.stringify(productsDB));
+    
+    renderProducts(productsDB);
+    renderAdminDashboard();
+    document.getElementById('addProductForm').reset();
+    alert('Product added successfully!');
+  };
+
+  reader.readAsDataURL(imageFile);
+}
 
       productsDB.unshift(newProduct);
       localStorage.setItem('shopnest_products', JSON.stringify(productsDB));
